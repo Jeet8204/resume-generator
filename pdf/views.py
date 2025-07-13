@@ -10,7 +10,6 @@ from resume_generator import settings
 from .models import Profile
 import pdfkit
 
-
 def home_redirect(request):
     if not request.user.is_authenticated:
         return redirect('/accounts/login/')
