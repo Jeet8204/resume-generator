@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign In with Google | Resume Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
+      background-size: 400% 400%;
+      animation: gradient 12s ease infinite;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    @keyframes gradient {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center text-white">
+
+  <div class="glass max-w-md w-full text-center">
+    <h1 class="text-3xl font-bold mb-4 text-yellow-300">Sign In Via Google</h1>
+
+    <p class="mb-6 text-gray-200">
+      You are about to sign in using your Google account. Please confirm to continue.
+    </p>
+
+    <form method="post" action="">
+      {% csrf_token %}
+      <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-6 py-3 rounded-full transition duration-300">
+        ✅ Continue with Google
+      </button>
+    </form>
+
+    <a href="{% url 'account_login' %}" class="mt-4 inline-block text-sm text-red-400 hover:text-red-300 underline">
+      Cancel
+    </a>
+  </div>
+
+</body>
+</html>
