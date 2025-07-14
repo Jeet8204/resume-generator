@@ -71,6 +71,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://resume-generator-pqlv.onrender.com',   # ← exact Render URL
 ]
 
+
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
