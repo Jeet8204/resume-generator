@@ -148,7 +148,7 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 # PDFKIT SETUP
-WKHTMLTOPDF_CMD = r"E:\Django\wkhtmltox-0.12.6-1.mxe-cross-win64\wkhtmltox\bin\wkhtmltopdf.exe"
+WKHTMLTOPDF_CMD = os.path.join(BASE_DIR, 'bin', 'wkhtmltopdf')
 
 # LANGUAGE & TIMEZONE
 LANGUAGE_CODE = 'en-us'
@@ -158,3 +158,5 @@ USE_TZ = True
 
 # DEFAULT PRIMARY KEY
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
