@@ -10,52 +10,49 @@ from resume_generator import settings
 from .models import Profile
 import pdfkit
 
+
 def home_redirect(request):
+    # This is your `/` route — it will redirect to Google login if not logged in
     if not request.user.is_authenticated:
-        return redirect('/accounts/login/')
-    else:
-        return redirect(reverse('accept'))  # Make sure 'accept' is NOT mapped to '/'
+        return redirect('/accounts/google/login/')  # 🔗 Go to Google login directly
+    return redirect('accept')  # ✅ After login, go to resume form
+
 
 @login_required
 def accept(request):
+    # This is your form view (POST + GET)
     if request.method == "POST":
-        name = request.POST.get("name", "")
-        email = request.POST.get("email", "")
-        phone = request.POST.get("phone", "")
-        summary = request.POST.get("summary", "")
-        degree = request.POST.get("degree", "")
-        school = request.POST.get("school", "")
-        university = request.POST.get("university", "")
-        previous_work = request.POST.get("previous_work", "")
-        skills = request.POST.get("skills", "")
+        data = {
+            "name": request.POST.get("name", ""),
+            "email": request.POST.get("email", ""),
+            "phone": request.POST.get("phone", ""),
+            "summary": request.POST.get("summary", ""),
+            "degree": request.POST.get("degree", ""),
+            "school": request.POST.get("school", ""),
+            "university": request.POST.get("university", ""),
+            "previous_work": request.POST.get("previous_work", ""),
+            "skills": request.POST.get("skills", "")
+        }
 
-        profile = Profile(
-            name=name,
-            email=email,
-            phone=phone,
-            summary=summary,
-            degree=degree,
-            school=school,
-            university=university,
-            previous_work=previous_work,
-            skills=skills
-        )
+        profile = Profile(**data)
         profile.save()
 
-        # Render to PDF
-        html = render_to_string("pdf/resume.html", {"user_profile": profile})
-        config = pdfkit.configuration(wkhtmltopdf=settings.WKHTMLTOPDF_CMD)
-        pdf_data = pdfkit.from_string(html, False, configuration=config)
+        try:
+            html = render_to_string("pdf/resume.html", {"user_profile": profile})
+            config = pdfkit.configuration(wkhtmltopdf=settings.WKHTMLTOPDF_CMD)
+            pdf_data = pdfkit.from_string(html, False, configuration=config)
 
-        # Email PDF
-        email_msg = EmailMessage(
-            subject="Your Resume PDF",
-            body="Hi, please find your attached resume.",
-            from_email=settings.EMAIL_HOST_USER,
-            to=[email],
-        )
-        email_msg.attach(f"{name}_resume.pdf", pdf_data, "application/pdf")
-        email_msg.send()
+            email_msg = EmailMessage(
+                subject="Your Resume PDF",
+                body="Hi, please find your attached resume.",
+                from_email=settings.EMAIL_HOST_USER,
+                to=[data['email']],
+            )
+            email_msg.attach(f"{data['name']}_resume.pdf", pdf_data, "application/pdf")
+            email_msg.send()
+
+        except Exception as e:
+            return render(request, "pdf/error.html", {"error": str(e)})
 
         return render(request, "pdf/submission_success.html")
 
@@ -63,38 +60,32 @@ def accept(request):
 
 
 @login_required
-def resume(request, id):
-    user_profile = get_object_or_404(Profile, pk=id)
+def download_resume(request, id):
+    profile = get_object_or_404(Profile, pk=id)
 
-    html = render_to_string("pdf/resume.html", {"user_profile": user_profile})
-    config = pdfkit.configuration(wkhtmltopdf=settings.WKHTMLTOPDF_CMD)
-    pdf_data = pdfkit.from_string(html, False, configuration=config)
+    try:
+        html = render_to_string("pdf/resume.html", {"user_profile": profile})
+        config = pdfkit.configuration(wkhtmltopdf=settings.WKHTMLTOPDF_CMD)
+        pdf_data = pdfkit.from_string(html, False, configuration=config)
 
-    # Email again
-    email = EmailMessage(
-        subject="Your Resume PDF",
-        body="Hi, please find your attached resume.",
-        from_email=settings.EMAIL_HOST_USER,
-        to=[user_profile.email],
-    )
-    email.attach(f"{user_profile.name}_resume.pdf", pdf_data, "application/pdf")
-    email.send()
+        email = EmailMessage(
+            subject="Your Resume PDF",
+            body="Hi, please find your attached resume.",
+            from_email=settings.EMAIL_HOST_USER,
+            to=[profile.email],
+        )
+        email.attach(f"{profile.name}_resume.pdf", pdf_data, "application/pdf")
+        email.send()
 
-    response = HttpResponse(pdf_data, content_type="application/pdf")
-    response["Content-Disposition"] = f'inline; filename="{user_profile.name}_resume.pdf"'
-    return response
+        response = HttpResponse(pdf_data, content_type="application/pdf")
+        response["Content-Disposition"] = f'inline; filename="{profile.name}_resume.pdf"'
+        return response
+
+    except Exception as e:
+        return render(request, "pdf/error.html", {"error": str(e)})
 
 
 @login_required
-def list(request):
+def profile_list(request):
     profiles = Profile.objects.all()
     return render(request, 'pdf/list.html', {'profiles': profiles})
-
-
-def list(request):
-    profiles = Profile.objects.all()
-    return render(request,'pdf/list.html',{'profiles':profiles})
-
-
-
-

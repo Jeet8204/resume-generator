@@ -17,16 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from pdf import views
-from pdf.views import accept, home_redirect
-
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.accept, name="accept"),
-    path('<int:id>/', views.resume, name="resume"),
-    path('accounts/', include('allauth.urls')),
-    path('list/', views.list, name="list"),
-    
-
+    path('', views.home_redirect, name="home"),       # Root URL → login or /accept
+    path('accept/', views.accept, name="accept"),      # Resume form
+    path('resume/<int:id>/', views.download_resume, name='resume'),
+    path('list/', views.profile_list, name="list"),
+    path('accounts/', include('allauth.urls')),        # Google login + auth
 ]

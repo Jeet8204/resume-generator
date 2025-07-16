@@ -1,7 +1,8 @@
 {% load static %}
+{% load socialaccount %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -25,9 +26,14 @@
       type="text/css"
     />
   </head>
-  <body
-    class="bg-gradient-to-br from-blue-100 to-purple-100 min-h-screen flex items-center justify-center px-4"
-  >
+  <body class="bg-gradient-to-br from-blue-100 to-purple-100 min-h-screen flex items-center justify-center px-4 relative">
+
+    <!-- Logout Button -->
+    <form method="post" action="{% url 'account_logout' %}" class="absolute top-4 right-4">
+      {% csrf_token %}
+      <button class="btn btn-error btn-sm text-white">Logout</button>
+    </form>
+
     <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-3xl">
       <h2 class="text-3xl font-bold mb-6 text-center text-purple-700">
         Resume Builder
